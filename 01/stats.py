@@ -2,35 +2,42 @@ import sys
 import re
 
 
-def openFile():
+def open_file():
     args = sys.argv
     return open(args[1], 'r', encoding="utf_8")
 
 
-def getComposers():
-    f = openFile()
+def get_composers():
+    f = open_file()
     composers = {}
     exp = re.compile(r"Composer: (.*)")
     for line in f:
-        getAllComposersFromLine(line, exp, composers)
+        get_all_composers_from_line(line, exp, composers)
     return composers
 
 
-def getAllComposersFromLine(line, expression, d):
+def get_all_composers_from_line(line, expression, d):
     match = expression.match(line)
     if match is not None:
         value = match.group(1)
-        composers = getMultipleComposersFromOneLine(value)
+        composers = get_multiple_composers_from_one_line(value)
         for composer in composers:
-            v = d.get(composer)
+            composer_without_years = extract_years_from_name(composer)
+            trimmed_composer = composer_without_years.strip()
+            v = d.get(trimmed_composer)
             if v is None:
-                d[composer] = 1
+                d[trimmed_composer] = 1
             else:
-                d[composer] = v + 1
+                d[trimmed_composer] = v + 1
 
 
-def getMultipleComposersFromOneLine(value):
-    return value.split("; ")
+def get_multiple_composers_from_one_line(value):
+    return value.split(";")
+
+
+def extract_years_from_name(name):
+    expression = re.compile(r"") #TODO!
+    return expression.match(name).group(1)
 
 
 # def getCenturies():
@@ -42,7 +49,7 @@ def getMultipleComposersFromOneLine(value):
 #     return centuries
 
 def main():
-    comps = getComposers()
+    comps = get_composers()
     for k, v in comps.items():
         print("%s: %d" % (k, v))
 
