@@ -44,7 +44,7 @@ def extract_years_from_name(name):
 def get_centuries():
     f = open_file()
     centuries = {}
-    exp = re.compile(r"Composition Year: (.*)")
+    exp = re.compile(r"Composition Year:(.*)")
     for line in f:
         get_all_centuries(line, exp, centuries)
     return centuries
@@ -56,7 +56,7 @@ def get_all_centuries(line, exp, d):
         value = match.group(1)
         year = get_year(value)
         if year is not None:
-            century = int(int(year.group(1))/100 + 1)
+            century = int(int(year.group(1))/100) + 1
             add_century(d, century)
         else:
             actual_century = get_century_otherwise(value)
@@ -74,12 +74,12 @@ def add_century(dictionary, century):
 
 
 def get_century_otherwise(value):
-    exp = re.compile(r".*([1-9][0-9]?).*")
+    exp = re.compile(r".*([0-9]{2}).*")
     return exp.match(value)
 
 
 def get_year(value):
-    exp = re.compile(r".*([1-2][0-9]{2,3}).*")
+    exp = re.compile(r".*([0-9]{4}).*")
     return exp.match(value)
 
 
