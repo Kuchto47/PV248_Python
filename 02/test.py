@@ -8,3 +8,5 @@ def test():
     for prnt in prints:
         prnt.format()
 
+
+test()
