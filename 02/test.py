@@ -7,6 +7,7 @@ def test():
     prints = scorelib.load(filename)
     for prnt in prints:
         prnt.format()
+        print("")
 
 
 test()
