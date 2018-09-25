@@ -1,45 +1,45 @@
 class Person:
     def __init__(self, name, born, died):
-        self.name = name
-        self.born = born
-        self.died = died
+        self.name = name  # string
+        self.born = born  # integer (or None)
+        self.died = died  # integer (or None)
 
 
 class Composition:
     def __init__(self, name, incipit, key, genre, year, voices, authors):
-        self.name = name
-        self.incipit = incipit
-        self.key = key
-        self.genre = genre
-        self.year = year
-        self.voices = voices
-        self.authors = authors
+        self.name = name  # string
+        self.incipit = incipit  # string
+        self.key = key  # string
+        self.genre = genre  # string
+        self.year = year  # int if integral year is given (or None)
+        self.voices = voices  # list of Voice instances
+        self.authors = authors  # list of Person instances
 
 
 class Print:
     def __init__(self, edition, print_id, partiture):
-        self.edition = edition
-        self.print_id = print_id
-        self.partiture = partiture
+        self.edition = edition  # instance of Edition
+        self.print_id = print_id  # int from "Print Number"
+        self.partiture = partiture  # boolean
 
     def format(self):
         raise NotImplemented
 
     def composition(self):
-        raise NotImplemented
+        return self.edition.composition
 
 
 class Edition:
     def __init__(self, composition, authors, name):
-        self.composition = composition
-        self.authors = authors
-        self.name = name
+        self.composition = composition  # instance of Composition
+        self.authors = authors  # list of Person instances
+        self.name = name  # string from "Edition" field (or None)
 
 
 class Voice:
     def __init__(self, name, range):
-        self.name = name
-        self.range = range
+        self.name = name  # string
+        self.range = range  # string
 
 
 def load(filename):
