@@ -66,6 +66,7 @@ def get_separated_source(file):
                 actual_record = [line]
         else:
             actual_record.append(line)
+    separated_source.append(actual_record)
     return separated_source
 
 
