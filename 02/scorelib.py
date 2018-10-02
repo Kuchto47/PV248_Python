@@ -38,18 +38,18 @@ class Print:
         return self.edition.composition
 
     def init_dictionary(self, my_dict):
-        my_dict["Title"] = self.composition().name
-        my_dict["Incipit"] = self.composition().incipit
-        my_dict["Key"] = self.composition().key
-        my_dict["Genre"] = self.composition().genre
-        my_dict["Year"] = self.composition().year
-        for v in self.composition().voices:
-            my_dict["Voice " + str(v.order)] = self.get_voice_string(v)
+        my_dict["Print Number"] = self.print_id
         my_dict["Composer"] = self.composition().get_composers()
+        my_dict["Title"] = self.composition().name
+        my_dict["Genre"] = self.composition().genre
+        my_dict["Key"] = self.composition().key
+        my_dict["Composition Year"] = self.composition().year
         my_dict["Edition"] = self.edition.name
         my_dict["Editor"] = self.edition.get_editors()
-        my_dict["Print Number"] = self.print_id
+        for v in self.composition().voices:
+            my_dict["Voice " + str(v.order)] = self.get_voice_string(v)
         my_dict["Partiture"] = self.partiture
+        my_dict["Incipit"] = self.composition().incipit
 
     def print_format(self, d):
         for k, v in d.items():
