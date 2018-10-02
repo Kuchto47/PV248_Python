@@ -70,6 +70,12 @@ def get_separated_source(file):
     return separated_source
 
 
+def get_partiture_text(partiture):
+    if partiture:
+        return "yes"
+    return "no"
+
+
 def get_edition_from_ln(ln):
     return standard_string_getter(ln)
 

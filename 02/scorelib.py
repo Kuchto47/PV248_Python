@@ -48,7 +48,7 @@ class Print:
         my_dict["Editor"] = self.edition.get_editors()
         for v in self.composition().voices:
             my_dict["Voice " + str(v.order)] = self.get_voice_string(v)
-        my_dict["Partiture"] = self.partiture
+        my_dict["Partiture"] = helper.get_partiture_text(self.partiture)
         my_dict["Incipit"] = self.composition().incipit
 
     def print_format(self, d):
