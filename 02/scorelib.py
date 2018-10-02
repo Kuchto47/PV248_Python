@@ -43,8 +43,8 @@ class Print:
         my_dict["Key"] = self.composition().key
         my_dict["Genre"] = self.composition().genre
         my_dict["Year"] = self.composition().year
-        for i, v in enumerate(self.composition().voices):
-            my_dict["Voice " + str(i+1)] = self.get_voice_string(v)
+        for v in self.composition().voices:
+            my_dict["Voice " + str(v.order)] = self.get_voice_string(v)
         my_dict["Composer"] = self.composition().get_composers()
         my_dict["Edition"] = self.edition.name
         my_dict["Editor"] = self.edition.get_editors()
@@ -79,9 +79,10 @@ class Edition:
 
 
 class Voice:
-    def __init__(self, name, range):
+    def __init__(self, name, rng, order):
         self.name = name  # string
-        self.range = range  # string
+        self.range = rng  # string
+        self.order = order  # determines order of voice in print
 
 
 def load(filename):
@@ -108,7 +109,7 @@ def get_list_of_prints(records):
         incipit = None
         key = None
         genre = None
-        voices = []
+        voices = {}
         composers = []
         for line in record:
             match = re.match(r"Print Number: ([0-9]+)", line)
@@ -150,9 +151,9 @@ def get_list_of_prints(records):
             if match is not None:
                 genre = helper.get_genre_from_line(match.group(1))
                 continue
-            match = re.match(r"Voice [0-9]{1,2}:(.*)", line)
+            match = re.match(r"Voice ([0-9]{1,2}):(.*)", line)
             if match is not None:
-                voices.append(helper.get_voice_from_line(match.group(1)))
+                voices[int(match.group(1))] = helper.get_voice_from_line(match.group(2))
                 continue
             match = re.match(r"Composer:(.*)", line)
             if match is not None:
@@ -206,13 +207,13 @@ def get_composition_obj(composers, voices, year, genre, key, incipit, title):
     for composer in composers:
         composers_list.append(create_composer_from_line(composer))
     voices_list = []
-    for v in voices:
+    for k, v in voices.items():
         if v is not None:
-            voices_list.append(get_voice_obj_from_line(v))
+            voices_list.append(get_voice_obj_from_line(k, v))
     return Composition(title, incipit, key, genre, year, voices_list, composers_list)
 
 
-def get_voice_obj_from_line(ln):
+def get_voice_obj_from_line(order, ln):
     rng = None
     name = None
     m = re.match(r"(\w+--\w+)", ln)
@@ -224,7 +225,7 @@ def get_voice_obj_from_line(ln):
         rest = re.sub(r"\w+--\w+,?", "", ln)
         if len(rest.strip()) != 0:
             name = rest.strip()
-    return Voice(name, rng)
+    return Voice(name, rng, order)
 
 
 def create_composer_from_line(composer):
