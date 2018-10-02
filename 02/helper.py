@@ -1,5 +1,6 @@
 import re
 
+
 def get_persons_list_string(d):
     result = ""
     for i, a in enumerate(d):
@@ -19,7 +20,7 @@ def get_persons_list_string(d):
     return result
 
 
-def get_compostition_year(yr):
+def get_composition_year(yr):
     match = re.match(r".*([0-9]{4}).*", yr)
     if match is not None:
         return int(match.group(1))
@@ -29,12 +30,25 @@ def get_compostition_year(yr):
 def get_individual_editors_from_string(text):
     result = []
     if len(text.strip()) == 0:
-        return None
+        return result
     texts = text.split(",")
     if len(texts) == 1:
-        return result.append(texts[0])
-    if len(texts) == 2:
-        # TODO
+        result.append(text)
+    else:
+        next_is_surname = False
+        name = ""
+        for txt in texts:
+            entry = txt.strip()
+            if next_is_surname:
+                next_is_surname = False
+                result.append(name + " " + entry)
+                name = ""
+            else:
+                if len(entry.split(" ")) >= 2:
+                    result.append(entry)  # has name and surname as well
+                else:
+                    name = entry
+                    next_is_surname = True
     return result
 
 

@@ -43,10 +43,8 @@ class Print:
         my_dict["Key"] = self.composition().key
         my_dict["Genre"] = self.composition().genre
         my_dict["Year"] = self.composition().year
-        number_of_voices = 0
         for i, v in enumerate(self.composition().voices):
-            my_dict["Voice " + str(i)] = v
-            number_of_voices += 1
+            my_dict["Voice " + str(i+1)] = self.get_voice_string(v)
         my_dict["Composer"] = self.composition().get_composers()
         my_dict["Edition"] = self.edition.name
         my_dict["Editor"] = self.edition.get_editors()
@@ -54,9 +52,20 @@ class Print:
         my_dict["Partiture"] = self.partiture
 
     def print_format(self, d):
-        for k, v in d:
+        for k, v in d.items():
             if v is not None:
                 print("%s: %s" % (k, str(v)))
+
+    def get_voice_string(self, voice):
+        res = None
+        if voice.range is not None:
+            res = voice.range
+            if voice.name is not None:
+                res += ", " + voice.name
+        else:
+            if voice.name is not None:
+                res = voice.name
+        return res
 
 
 class Edition:
@@ -79,7 +88,8 @@ def load(filename):
     f = open(filename, 'r', encoding="utf_8")
     separated_source = helper.get_separated_source(f)
     list_of_prints = get_list_of_prints(separated_source)
-    return list_of_prints.sort(key=sort_prints)
+    list_of_prints.sort(key=sort_prints)
+    return list_of_prints
 
 
 def sort_prints(p):
@@ -98,7 +108,7 @@ def get_list_of_prints(records):
         incipit = None
         key = None
         genre = None
-        voices = {}
+        voices = []
         composers = []
         for line in record:
             match = re.match(r"Print Number: ([0-9]+)", line)
@@ -122,7 +132,7 @@ def get_list_of_prints(records):
                 continue
             match = re.match(r"Composition Year:(.*)", line)
             if match is not None:
-                year = helper.get_compostition_year(match.group(1))
+                year = helper.get_composition_year(match.group(1))
                 continue
             match = re.match(r"Title:(.*)", line)
             if match is not None:
@@ -140,9 +150,9 @@ def get_list_of_prints(records):
             if match is not None:
                 genre = helper.get_genre_from_line(match.group(1))
                 continue
-            match = re.match(r"Voice ([0-9]{1,2}):(.*)", line)
+            match = re.match(r"Voice [0-9]{1,2}:(.*)", line)
             if match is not None:
-                voices[match.group(1)] = helper.get_voice_from_line(match.group(2))
+                voices.append(helper.get_voice_from_line(match.group(1)))
                 continue
             match = re.match(r"Composer:(.*)", line)
             if match is not None:
@@ -163,7 +173,7 @@ def get_list_of_prints(records):
                 composers
             )
         )
-    return []
+    return list_of_prints
 
 
 def create_print_object_from(print_number, partiture, edition, editors, year, title, incipit, key, genre, voices, composers):
@@ -196,10 +206,8 @@ def get_composition_obj(composers, voices, year, genre, key, incipit, title):
     for composer in composers:
         composers_list.append(create_composer_from_line(composer))
     voices_list = []
-    for k, v in voices:
-        if v is None:
-            continue
-        else:
+    for v in voices:
+        if v is not None:
             voices_list.append(get_voice_obj_from_line(v))
     return Composition(title, incipit, key, genre, year, voices_list, composers_list)
 
