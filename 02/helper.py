@@ -2,21 +2,21 @@ import re
 
 
 def get_persons_list_string(d):
-    result = ""
+    result = None
     for i, a in enumerate(d):
         if i == 0:
             result = a.name
         else:
             result = result + ", " + a.name
         if a.born is not None:
-            result = result + " (" + a.born + "-"
+            result = result + " (" + a.born + "--"
             if a.died is not None:
                 result = result + a.died + ")"
             else:
                 result = result + ")"
         else:
             if a.died is not None:
-                result = result + " (-" + a.died + ")"
+                result = result + " (--" + a.died + ")"
     return result
 
 
@@ -74,30 +74,6 @@ def get_partiture_text(partiture):
     if partiture:
         return "yes"
     return "no"
-
-
-def get_edition_from_ln(ln):
-    return standard_string_getter(ln)
-
-
-def get_title_from_line(ln):
-    return standard_string_getter(ln)
-
-
-def get_incipit_from_line(ln):
-    return standard_string_getter(ln)
-
-
-def get_key_from_line(ln):
-    return standard_string_getter(ln)
-
-
-def get_genre_from_line(ln):
-    return standard_string_getter(ln)
-
-
-def get_voice_from_line(ln):
-    return standard_string_getter(ln)
 
 
 def standard_string_getter(ln):

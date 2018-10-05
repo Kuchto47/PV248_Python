@@ -125,7 +125,7 @@ def get_list_of_prints(records):
                 continue
             match = re.match(r"Edition: (.*)", line)
             if match is not None:
-                edition = helper.get_edition_from_ln(match.group(1))
+                edition = helper.standard_string_getter(match.group(1))
                 continue
             match = re.match(r"Editor:(.*)", line)
             if match is not None:
@@ -137,23 +137,23 @@ def get_list_of_prints(records):
                 continue
             match = re.match(r"Title:(.*)", line)
             if match is not None:
-                title = helper.get_title_from_line(match.group(1))
+                title = helper.standard_string_getter(match.group(1))
                 continue
             match = re.match(r"Incipit:(.*)", line)
             if match is not None:
-                incipit = helper.get_incipit_from_line(match.group(1))
+                incipit = helper.standard_string_getter(match.group(1))
                 continue
             match = re.match(r"Key:(.*)", line)
             if match is not None:
-                key = helper.get_key_from_line(match.group(1))
+                key = helper.standard_string_getter(match.group(1))
                 continue
             match = re.match(r"Genre:(.*)", line)
             if match is not None:
-                genre = helper.get_genre_from_line(match.group(1))
+                genre = helper.standard_string_getter(match.group(1))
                 continue
             match = re.match(r"Voice ([0-9]{1,2}):(.*)", line)
             if match is not None:
-                voices[int(match.group(1))] = helper.get_voice_from_line(match.group(2))
+                voices[int(match.group(1))] = helper.standard_string_getter(match.group(2))
                 continue
             match = re.match(r"Composer:(.*)", line)
             if match is not None:
