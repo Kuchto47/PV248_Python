@@ -198,7 +198,7 @@ def get_editors_list(editors):
             name = re.sub(rm2, "", name)
             name = re.sub(rm3, "", name)
             name = re.sub(rm4, "", name)
-        ed_lst.append(Person(name, None, None))
+        ed_lst.append(Person(name.strip(), None, None))
     return ed_lst
 
 
