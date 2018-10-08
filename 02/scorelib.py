@@ -216,13 +216,13 @@ def get_composition_obj(composers, voices, year, genre, key, incipit, title):
 def get_voice_obj_from_line(order, ln):
     rng = None
     name = None
-    m = re.match(r"(\w+--\w+)", ln)
+    m = re.match(r"([^,; ]+--[^,; ]+)", ln)
     if m is None:
         if len(ln.strip()) != 0:
             name = ln.strip()
     else:
         rng = m.group(1)
-        rest = re.sub(r"\w+--\w+[;,]?", "", ln)
+        rest = re.sub(r"[^,; ]+--[^,; ]+[;,]?", "", ln)
         if len(rest.strip()) != 0:
             name = rest.strip()
     return Voice(name, rng, order)

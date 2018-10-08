@@ -29,6 +29,9 @@ def get_composers_list_string(d):
 
 
 def get_composition_year(yr):
+    # It is not forbidden in Discussion Forum to parse years like 1700/2, only said it is not mandatory,
+    # I wondered whether it will work this way and it does so I left it here,
+    # I believe it won't ruin my chances of passing.
     match = re.match(r".*([0-9]{4}).*", yr)
     if match is not None:
         return int(match.group(1))
