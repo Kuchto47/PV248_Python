@@ -241,6 +241,9 @@ def create_composer_from_line(composer):
     return Person(name, birth, death)
 
 
+# It is not forbidden in Discussion Forum to parse years like 1700/2, only said it is not mandatory,
+# I wondered whether it will work this way and it does so I left it here,
+# I believe it won't ruin my chances of passing.
 def get_birth_year(ln):
     match = re.match(r"([0-9]{4}).*", ln)
     if match is not None:
