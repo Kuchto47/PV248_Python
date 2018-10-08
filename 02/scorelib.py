@@ -20,7 +20,7 @@ class Composition:
         self.authors = authors  # list of Person instances
 
     def get_composers(self):
-        return helper.get_persons_list_string(self.authors)
+        return helper.get_composers_list_string(self.authors)
 
 
 class Print:
@@ -75,7 +75,7 @@ class Edition:
         self.name = name  # string from "Edition" field (or None)
 
     def get_editors(self):
-        return helper.get_persons_list_string(self.authors)
+        return helper.get_editors_list_string(self.authors)
 
 
 class Voice:
@@ -234,7 +234,7 @@ def create_composer_from_line(composer):
         name = None
     birth = None
     death = None
-    match_brackets = re.match(r"\(([^)]*)\)", composer)
+    match_brackets = re.match(r".*\(([^)]*)\).*", composer)
     if match_brackets is not None:
         birth = get_birth_year(match_brackets.group(1))
         death = get_death_year(match_brackets.group(1))

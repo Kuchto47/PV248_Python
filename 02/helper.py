@@ -1,23 +1,31 @@
 import re
 
 
-def get_persons_list_string(d):
+def get_persons_list_string(d, delimiter):
     result = None
     for i, a in enumerate(d):
         if i == 0:
             result = a.name
         else:
-            result = result + ", " + a.name
+            result = result + delimiter + " " + a.name
         if a.born is not None:
-            result = result + " (" + a.born + "--"
+            result = result + " (" + str(a.born) + "--"
             if a.died is not None:
-                result = result + a.died + ")"
+                result = result + str(a.died) + ")"
             else:
                 result = result + ")"
         else:
             if a.died is not None:
-                result = result + " (--" + a.died + ")"
+                result = result + " (--" + str(a.died) + ")"
     return result
+
+
+def get_editors_list_string(d):
+    return get_persons_list_string(d, ",")
+
+
+def get_composers_list_string(d):
+    return get_persons_list_string(d, ";")
 
 
 def get_composition_year(yr):
