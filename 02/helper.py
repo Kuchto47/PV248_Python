@@ -49,7 +49,7 @@ def get_individual_editors_from_string(text):
             entry = txt.strip()
             if next_is_surname:
                 next_is_surname = False
-                result.append(name + " " + entry)
+                result.append(name + ", " + entry)
                 name = ""
             else:
                 if len(entry.split(" ")) >= 2:

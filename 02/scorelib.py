@@ -186,10 +186,10 @@ def create_print_object_from(print_number, partiture, edition, editors, year, ti
 
 def get_editors_list(editors):
     ed_lst = []
-    rm1 = r"(partiture)"
+    rm1 = r"\(partiture\)"
     rm2 = r"arranger"
     rm3 = r"continuo:"
-    rm4 = r"(bass realisation)"
+    rm4 = r"\(bass realisation\)"
     for editor in editors:
         name = None
         stripped_editor = editor.strip()
@@ -222,7 +222,7 @@ def get_voice_obj_from_line(order, ln):
             name = ln.strip()
     else:
         rng = m.group(1)
-        rest = re.sub(r"\w+--\w+,?", "", ln)
+        rest = re.sub(r"\w+--\w+[;,]?", "", ln)
         if len(rest.strip()) != 0:
             name = rest.strip()
     return Voice(name, rng, order)
