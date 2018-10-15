@@ -25,6 +25,7 @@ def init_db():
 def put_data_into_db(db, datas):
     for rec in datas:
         write_object(db, rec)
+    db.commit()
 
 
 def write_object(db, rec):
@@ -37,41 +38,61 @@ def write_object(db, rec):
     insert_edition_authors(c, editors_ids, edition_id)
     insert_voices(c, rec.edition.composition.voices, score_id)
     insert_print(c, rec, edition_id)
-    db.commit()
+    c.close()
 
 
 def insert_print(cursor, record, edition_id):
     partiture = 'N'
     if record.partiture:
         partiture = 'Y'
-    cursor.execute("INSERT INTO print(partiture, edition) VALUES (?,?)", (partiture, edition_id))
+    v = (record.print_id, partiture, edition_id)
+    cursor.execute("SELECT * from print WHERE id IS ?", (record.print_id,))
+    if cursor.fetchone() is None:
+        cursor.execute("INSERT INTO print(id, partiture, edition) VALUES (?,?,?)", v)
 
 
 def insert_voices(cursor, voices, score_id):
     for voice in voices:
-        cursor.execute("INSERT INTO voice(number, score, range, name) VALUES (?,?,?,?)",
-                       (voice.order, score_id, voice.range, voice.name))
+        v = (voice.order, score_id, voice.range, voice.name)
+        cursor.execute("SELECT * FROM voice WHERE number IS ? AND score IS ? AND range IS ? AND name IS ?", v)
+        if cursor.fetchone() is None:
+            cursor.execute("INSERT INTO voice(number, score, range, name) VALUES (?,?,?,?)", v)
 
 
 def insert_edition_authors(cursor, editors_ids, edition_id):
     for editor in editors_ids:
-        cursor.execute("INSERT INTO edition_author(edition, editor) VALUES (?,?)", (edition_id, editor))
+        v = (edition_id, editor)
+        cursor.execute("SELECT * FROM edition_author WHERE edition IS ? AND editor is ?", v)
+        if cursor.fetchone() is None:
+            cursor.execute("INSERT INTO edition_author(edition, editor) VALUES (?,?)", v)
 
 
 def insert_score_authors(cursor, composers_ids, score_id):
     for composer in composers_ids:
-        cursor.execute("INSERT INTO score_author(score, composer) VALUES (?,?)", (score_id, composer))
+        v = (score_id, composer)
+        cursor.execute("SELECT * FROM score_author WHERE score IS ? AND composer is ?", v)
+        if cursor.fetchone() is None:
+            cursor.execute("INSERT INTO score_author(score, composer) VALUES (?,?)", v)
 
 
 def insert_edition(cursor, edition, score_id):
-    cursor.execute("INSERT INTO edition(score, name, year) VALUES (?,?,?)", (score_id, edition.name, None))
-    return cursor.lastrowid
+    v = (score_id, edition.name, None)
+    cursor.execute("SELECT * FROM edition WHERE score IS ? AND name IS ? AND year IS ?", v)
+    result = cursor.fetchone()
+    if result is None:
+        cursor.execute("INSERT INTO edition(score, name, year) VALUES (?,?,?)", v)
+        return cursor.lastrowid
+    return result[0]
 
 
 def insert_score(cursor, composition):
-    cursor.execute("INSERT INTO score(name, genre, key, incipit, year) VALUES (?,?,?,?,?)",
-                   (composition.name, composition.genre, composition.key, composition.incipit, composition.year))
-    return cursor.lastrowid
+    v = (composition.name, composition.genre, composition.key, composition.incipit, composition.year)
+    cursor.execute("SELECT * FROM score WHERE name IS ? AND genre IS ? AND key IS ? AND incipit IS ? AND year IS ?", v)
+    result = cursor.fetchone()
+    if result is None:
+        cursor.execute("INSERT INTO score(name, genre, key, incipit, year) VALUES (?,?,?,?,?)", v)
+        return cursor.lastrowid
+    return result[0]
 
 
 def insert_persons(cursor, persons):
@@ -80,7 +101,7 @@ def insert_persons(cursor, persons):
         name = person.name
         if name is None:
             name = ""
-        cursor.execute("SELECT * FROM person WHERE name=?", (name,))
+        cursor.execute("SELECT * FROM person WHERE name IS ?", (name,))
         fetched = cursor.fetchone()
         if fetched is None:
             cursor.execute("INSERT INTO person(born, died, name) VALUES (?,?,?)", (person.born, person.died, name))
