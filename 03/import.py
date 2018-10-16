@@ -92,6 +92,8 @@ def insert_edition(cursor, edition, score_id):
 def check_edition_authors_and_add_edition_if_needed(edition_id, authors, cursor, values):
     cursor.execute("SELECT * FROM edition_author WHERE edition IS ?", (edition_id,))
     edition_authors = cursor.fetchall()
+    if len(edition_authors) != len(authors):
+        return insert_extra_edition(cursor, values)
     for edition_author in edition_authors:
         cursor.execute("SELECT * FROM person WHERE id IS ?", (edition_author[2],))
         editor_db = cursor.fetchone()
@@ -99,9 +101,13 @@ def check_edition_authors_and_add_edition_if_needed(edition_id, authors, cursor,
         for editor in authors:
             editors_match = editors_match or check_if_persons_match(editor_db, editor)
         if not editors_match:
-            cursor.execute("INSERT INTO edition(score, name, year) VALUES (?,?,?)", values)
-            return cursor.lastrowid
+            return insert_extra_edition(cursor, values)
     return None
+
+
+def insert_extra_edition(cursor, values):
+    cursor.execute("INSERT INTO edition(score, name, year) VALUES (?,?,?)", values)
+    return cursor.lastrowid
 
 
 def check_if_persons_match(person_db, person):
@@ -129,6 +135,8 @@ def insert_score(cursor, composition):
 def check_score_authors_and_add_score_if_needed(score_id, authors, cursor, values):
     cursor.execute("SELECT * FROM score_author WHERE score IS ?", (score_id,))
     score_authors = cursor.fetchall()
+    if len(score_authors) != len(authors):
+        return insert_extra_score(cursor, values)
     for score_author in score_authors:
         cursor.execute("SELECT * FROM person WHERE id IS ?", (score_author[2],))
         composer_db = cursor.fetchone()
@@ -136,21 +144,26 @@ def check_score_authors_and_add_score_if_needed(score_id, authors, cursor, value
         for composer in authors:
             composers_match = composers_match or check_if_persons_match(composer_db, composer)
         if not composers_match:
-            cursor.execute("INSERT INTO score(name, genre, key, incipit, year) VALUES (?,?,?,?,?)", values)
-            return cursor.lastrowid
+            return insert_extra_score(cursor, values)
     return None
+
+
+def insert_extra_score(cursor, values):
+    cursor.execute("INSERT INTO score(name, genre, key, incipit, year) VALUES (?,?,?,?,?)", values)
+    return cursor.lastrowid
 
 
 def check_score_voices_and_add_score_if_needed(score_id, voices, cursor, values):
     cursor.execute("SELECT * FROM voice WHERE score IS ?", (score_id,))
     voices_db = cursor.fetchall()
+    if len(voices_db) != len(voices):
+        return insert_extra_score(cursor, values)
     for voice_db in voices_db:
         voices_match = False
         for voice in voices:
             voices_match = voices_match or check_if_voices_match(voice_db, voice)
         if not voices_match:
-            cursor.execute("INSERT INTO score(name, genre, key, incipit, year) VALUES (?,?,?,?,?)", values)
-            return cursor.lastrowid
+            return insert_extra_score(cursor, values)
     return None
 
 
