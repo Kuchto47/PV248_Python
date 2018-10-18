@@ -1,14 +1,14 @@
-import datagetter
+import scorelib
 import sys
 import sqlite3
 
 
 def obtain_input_data_as_objects():
-    return datagetter.get_print_objects_from_file(sys.argv[1])
+    return scorelib.load(sys.argv[1])
 
 
 def init_db():
-    db_file = sys.argv[2]  # 2!!!
+    db_file = sys.argv[2]
     connection = sqlite3.connect(db_file)
     c = connection.cursor()
     c.execute("create table person ( id integer primary key not null, born integer, died integer, name varchar not null );")
