@@ -82,7 +82,6 @@ def insert_edition(cursor, edition, score_id):
     if result is None:
         cursor.execute("INSERT INTO edition(score, name, year) VALUES (?,?,?)", v)
         return cursor.lastrowid
-    # improvement starts here
     result_of_check = check_edition_authors_and_add_edition_if_needed(result[0], edition.authors, cursor, v)
     if result_of_check is not None:
         return result_of_check
@@ -121,7 +120,6 @@ def insert_score(cursor, composition):
     if result is None:
         cursor.execute("INSERT INTO score(name, genre, key, incipit, year) VALUES (?,?,?,?,?)", v)
         return cursor.lastrowid
-    # improvement starts here
     result_of_checking_authors = check_score_authors_and_add_score_if_needed(result[0], composition.authors, cursor, v)
     if result_of_checking_authors is None:
         result_of_checking_voices = check_score_voices_and_add_score_if_needed(result[0], composition.voices, cursor, v)
@@ -176,7 +174,6 @@ def insert_persons(cursor, persons):
     for person in persons:
         name = person.name
         if name is None:
-            # name = ""
             continue
         cursor.execute("SELECT * FROM person WHERE name IS ?", (name,))
         fetched = cursor.fetchone()
