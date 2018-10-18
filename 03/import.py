@@ -176,7 +176,8 @@ def insert_persons(cursor, persons):
     for person in persons:
         name = person.name
         if name is None:
-            name = ""
+            # name = ""
+            continue
         cursor.execute("SELECT * FROM person WHERE name IS ?", (name,))
         fetched = cursor.fetchone()
         if fetched is None:
