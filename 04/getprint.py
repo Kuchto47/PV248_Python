@@ -12,22 +12,22 @@ def main():
 
 
 def get_composers_from_print_id(print_number, cursor):
-    cursor.execute("SELECT edition FROM print WHERE id IS ?", (print_number,))
-    print_record = cursor.fetchone()
-    cursor.execute("SELECT score FROM edition WHERE id IS ?", (print_record[0],))
-    edition_record = cursor.fetchone()
-    cursor.execute("SELECT composer FROM score_author WHERE score IS ?", (edition_record[0],))
-    score_authors = cursor.fetchall()
+    cursor.execute("SELECT person.name, person.born, person.died "
+                   "FROM person "
+                   "WHERE person.id IN "
+                   "(SELECT score_author.composer "
+                   "FROM (print INNER JOIN edition ON print.edition = edition.id) "
+                   "INNER JOIN score_author ON score_author.score = edition.score "
+                   "WHERE print.id = ?)", (print_number,))
+    persons = cursor.fetchall()
     result = []
-    for score_author in score_authors:
-        cursor.execute("SELECT name, born, died FROM person WHERE id IS ?", (score_author[0],))
-        composer = cursor.fetchone()
+    for person in persons:
         d = {}
-        d["name"] = composer[0]
-        if composer[1] is not None:
-            d["born"] = str(composer[1])
-        if composer[2] is not None:
-            d["died"] = str(composer[2])
+        d["name"] = person[0]
+        if person[1] is not None:
+            d["born"] = str(person[1])
+        if person[2] is not None:
+            d["died"] = str(person[2])
         result.append(d)
     return result
 
