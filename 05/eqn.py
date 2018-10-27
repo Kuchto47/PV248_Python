@@ -1,6 +1,7 @@
 import numpy
 import sys
 import re
+import copy
 
 
 def main():
@@ -18,25 +19,36 @@ def main():
         results.append(res_list[-1])
         augmented_matrix.append(res_list)
     print(matrix, "###", results, "###", variables)  # check of parsing -- delete before final push
-    solve(matrix, results, variables, augmented_matrix)
+    try_solve(matrix, results, variables, augmented_matrix)
 
 
-def solve(matrix, results, variables, augmented_matrix):
+def try_solve(matrix, results, variables, augmented_matrix):
     number_of_solutions = get_solutions_count(matrix, augmented_matrix, len(variables))
     if number_of_solutions == 0:
         print("no solution")
     elif number_of_solutions == 1:
-        a = numpy.array(matrix)
-        b = numpy.array(results)
-        result = numpy.linalg.solve(a, b)
-        result_string = ""
-        for i, r in enumerate(result):
-            result_string += variables[i] + " = " + str(r)
-            if i < len(result):
-                result_string += ", "
-        print("solution: "+result_string)
+        solve(matrix, results, variables)
     else:
         print("solution space dimension: 1")
+
+
+def solve(matrix, results, variables):
+    result = get_solution(matrix, results)
+    result_string = ""
+    sorted_variables = copy.deepcopy(variables)
+    sorted_variables.sort()
+    for i, var in enumerate(sorted_variables):
+        index_of_var_in_original_list = variables.index(var)
+        result_string += var + " = " + str(result[index_of_var_in_original_list])
+        if i < len(result):
+            result_string += ", "
+    print("solution: " + result_string)
+
+
+def get_solution(matrix, results):
+    a = numpy.array(matrix)
+    b = numpy.array(results)
+    return numpy.linalg.solve(a, b)
 
 
 def get_solutions_count(coef_matrix, augm_matrix, number_of_vars):
