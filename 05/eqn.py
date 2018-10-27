@@ -39,7 +39,7 @@ def solve(matrix, results, variables):
     for i, var in enumerate(sorted_variables):
         index_of_var_in_original_list = variables.index(var)
         result_string += var + " = " + str(result[index_of_var_in_original_list])
-        if i < len(result):
+        if i < len(result) - 1:
             result_string += ", "
     print("solution: " + result_string)
 
