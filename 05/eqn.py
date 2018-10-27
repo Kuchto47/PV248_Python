@@ -1,4 +1,4 @@
-#import numpy
+import numpy
 import sys
 import re
 
@@ -9,13 +9,42 @@ def main():
     matrix = []
     results = []
     variables = []
+    augmented_matrix = []
     for line in file:
         splitted_equations.append(re.findall(r"(-? ?[0-9a-zA-Z]+)", line))
     for equation in splitted_equations:
         res_list = get_equation_as_numbers(equation, variables)
         matrix.append(res_list[:-1])
         results.append(res_list[-1])
+        augmented_matrix.append(res_list)
     print(matrix, "###", results, "###", variables)  # check of parsing -- delete before final push
+    solve(matrix, results, variables, augmented_matrix)
+
+
+def solve(matrix, results, variables, augmented_matrix):
+    number_of_solutions = get_solutions_count(matrix, augmented_matrix, len(variables))
+    if number_of_solutions == 0:
+        print("no solution")
+    elif number_of_solutions == 1:
+        a = numpy.array(matrix)
+        b = numpy.array(results)
+        result = numpy.linalg.solve(a, b)
+        result_string = ""
+        for i, r in enumerate(result):
+            result_string += variables[i] + " = " + str(r)
+            if i < len(result):
+                result_string += ", "
+        print("solution: "+result_string)
+    else:
+        print("solution space dimension: 1")
+
+
+def get_solutions_count(coef_matrix, augm_matrix, number_of_vars):
+    coef_matrix_rank = numpy.linalg.matrix_rank(coef_matrix)
+    augm_matrix_rank = numpy.linalg.matrix_rank(augm_matrix)
+    if coef_matrix_rank != augm_matrix_rank:
+        return 0
+    return 1 if number_of_vars == coef_matrix_rank else 2
 
 
 def get_equation_as_numbers(eq, variables):
