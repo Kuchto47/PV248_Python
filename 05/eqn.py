@@ -18,7 +18,6 @@ def main():
         matrix.append(res_list[:-1])
         results.append(res_list[-1])
         augmented_matrix.append(res_list)
-    print(matrix, "###", results, "###", variables)  # check of parsing -- delete before final push
     try_solve(matrix, results, variables, augmented_matrix)
 
 
