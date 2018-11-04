@@ -13,11 +13,21 @@ def main():
     augmented_matrix = []
     for line in file:
         splitted_equations.append(re.findall(r"(-? ?[0-9a-zA-Z]+)", line))
+    previous_equation_number_of_variables = 0
     for equation in splitted_equations:
         res_list = get_equation_as_numbers(equation, variables)
+        if previous_equation_number_of_variables != 0:
+            if len(res_list) != previous_equation_number_of_variables:
+                number_of_additions = len(res_list) - previous_equation_number_of_variables
+                for j in range(number_of_additions):
+                    for i, l in enumerate(matrix):
+                        l.append(0)
+                        matrix[i] = l
+        previous_equation_number_of_variables = len(res_list)
         matrix.append(res_list[:-1])
         results.append(res_list[-1])
         augmented_matrix.append(res_list)
+    print(matrix, results, variables)
     try_solve(matrix, results, variables, augmented_matrix)
 
 
