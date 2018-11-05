@@ -30,13 +30,18 @@ def main():
 
 def try_solve(matrix, results, variables):
     augmented_matrix = get_augmented_matrix(matrix, results)
-    number_of_solutions = get_solutions_count(matrix, augmented_matrix, len(variables))
+    t = compute_ranks(matrix, augmented_matrix)
+    number_of_solutions = get_solutions_count(t[0], t[1], len(variables))
     if number_of_solutions == 0:
         print("no solution")
     elif number_of_solutions == 1:
         solve(matrix, results, variables)
     else:
-        print("solution space dimension: 1")
+        print("solution space dimension: "+str(len(variables) - t[0]))
+
+
+def compute_ranks(m, a):
+    return numpy.linalg.matrix_rank(m), numpy.linalg.matrix_rank(a)
 
 
 def solve(matrix, results, variables):
@@ -58,9 +63,7 @@ def get_solution(matrix, results):
     return numpy.linalg.solve(a, b)
 
 
-def get_solutions_count(coef_matrix, augm_matrix, number_of_vars):
-    coef_matrix_rank = numpy.linalg.matrix_rank(coef_matrix)
-    augm_matrix_rank = numpy.linalg.matrix_rank(augm_matrix)
+def get_solutions_count(coef_matrix_rank, augm_matrix_rank, number_of_vars):
     if coef_matrix_rank != augm_matrix_rank:
         return 0
     return 1 if number_of_vars == coef_matrix_rank else 2
