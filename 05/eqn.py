@@ -10,7 +10,6 @@ def main():
     matrix = []
     results = []
     variables = []
-    augmented_matrix = []
     for line in file:
         splitted_equations.append(re.findall(r"(-? *[0-9a-zA-Z]+)", line))
     previous_equation_number_of_variables = 0
@@ -26,11 +25,11 @@ def main():
         previous_equation_number_of_variables = len(res_list)
         matrix.append(res_list[:-1])
         results.append(res_list[-1])
-        augmented_matrix.append(res_list)
-    try_solve(matrix, results, variables, augmented_matrix)
+    try_solve(matrix, results, variables)
 
 
-def try_solve(matrix, results, variables, augmented_matrix):
+def try_solve(matrix, results, variables):
+    augmented_matrix = get_augmented_matrix(matrix, results)
     number_of_solutions = get_solutions_count(matrix, augmented_matrix, len(variables))
     if number_of_solutions == 0:
         print("no solution")
@@ -65,6 +64,15 @@ def get_solutions_count(coef_matrix, augm_matrix, number_of_vars):
     if coef_matrix_rank != augm_matrix_rank:
         return 0
     return 1 if number_of_vars == coef_matrix_rank else 2
+
+
+def get_augmented_matrix(matrix, results):
+    augmented_matrix = []
+    for i, m in enumerate(matrix):
+        elem = copy.deepcopy(matrix[i])
+        elem.append(results[i])
+        augmented_matrix.append(elem)
+    return augmented_matrix
 
 
 def get_equation_as_numbers(eq, variables):
