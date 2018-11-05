@@ -9,25 +9,26 @@ def open_file(file_name):
 
 
 def main():
+    # file opening
     file = open_file(sys.argv[1])
     params = file.getparams()  # ([0]nchannels, [1]sampwidth, [2]framerate, [3]nframes, [4]comptype, [5]compname)
-    frames = file.readframes(params[3])
+    data = file.readframes(params[3])
     file.close()
-    total_samples = params[0] * params[3]
-    fmt = "%ih" % total_samples
-    unpacked_frames = struct.unpack(fmt, frames)
-    audio_duration = params[3]/params[2]
-    window_number = 1
-    window_size = params[2]
-    windows = []
-    while window_number < audio_duration:
-        window = []
-        for i in range(window_size):
-            window.append(unpacked_frames[((window_number - 1) * window_size)+i])
-        windows.append(window)
-        window_number += 1
-    for win in windows:
-        print(numpy.fft.rfft(win))
+    # file closing
+    # getting data
+    data_size = params[0] * params[3]
+    # fmt = "%ih" % data_size
+    unpacked_data = struct.unpack('{n}h'.format(n=data_size), data)
+    unpacked_data = numpy.array(unpacked_data)
+    #getting data done
+    w = numpy.fft.fft(unpacked_data)
+    freqs = numpy.fft.fftfreq(len(w))
+    print(freqs.min(), freqs.max())
+    # find peak
+    idx = numpy.argmax(numpy.abs(w))
+    freq = freqs[idx]
+    freq_in_hertz = abs(freq * params[2])
+    print(freq_in_hertz)
 
 
 main()
