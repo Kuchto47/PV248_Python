@@ -12,7 +12,7 @@ def main():
     variables = []
     augmented_matrix = []
     for line in file:
-        splitted_equations.append(re.findall(r"(-? ?[0-9a-zA-Z]+)", line))
+        splitted_equations.append(re.findall(r"(-? *[0-9a-zA-Z]+)", line))
     previous_equation_number_of_variables = 0
     for equation in splitted_equations:
         res_list = get_equation_as_numbers(equation, variables)
