@@ -43,7 +43,5 @@ def print_peaks(mi, ma):
     else:
         print("no peaks")
 
-# haha
-
 
 main()
