@@ -17,40 +17,21 @@ def main():
 
 
 def exercises(data):
-    extra_length = len(" YYYY-MM-DD/")
-    grouped_data = data.groupby(data.columns.map(lambda x: x[extra_length:]), axis=1).sum()
-    keys = grouped_data.keys()
-    d = {}
-    stats = get_means_medians_quantiles(grouped_data)
-    for key in keys:
-        if key == "student"[extra_length:]:
-            continue
-        d[key] = get_statistics(stats[0][[key]], stats[1][[key]], get_number_of_passed_guys(grouped_data.loc[:, key]), key)
-    json.dump(d, sys.stdout, indent=4, ensure_ascii=False)
+    extra_length = len("YYYY-MM-DD/")
+    clear_data = data.drop(columns="student")
+    grouped_data = clear_data.groupby(clear_data.columns.map(lambda x: x[extra_length:]), axis=1).sum()
+    json.dump(get_dictionary(grouped_data), sys.stdout, indent=4, ensure_ascii=False)
 
 
 def dates(data):
     extra_length = len("/NN")*(-1)
-    grouped_data = data.groupby(data.columns.map(lambda x: x[:extra_length]), axis=1).sum()
-    keys = grouped_data.keys()
-    d = {}
-    stats = get_means_medians_quantiles(grouped_data)
-    for key in keys:
-        if key == "student"[:extra_length]:
-            continue
-        d[key] = get_statistics(stats[0][[key]], stats[1][[key]], get_number_of_passed_guys(grouped_data.loc[:, key]), key)
-    json.dump(d, sys.stdout, indent=4, ensure_ascii=False)
+    clear_data = data.drop(columns="student")
+    grouped_data = clear_data.groupby(clear_data.columns.map(lambda x: x[:extra_length]), axis=1).sum()
+    json.dump(get_dictionary(grouped_data), sys.stdout, indent=4, ensure_ascii=False)
 
 
 def deadlines(data):
-    keys = data.keys()
-    stats = get_means_medians_quantiles(data)
-    d = {}
-    for key in keys:
-        if key == "student":
-            continue
-        d[key] = get_statistics(stats[0][[key]], stats[1][[key]], get_number_of_passed_guys(data.loc[:, key]), key)
-    json.dump(d, sys.stdout, indent=4, ensure_ascii=False)
+    json.dump(get_dictionary(data.drop(columns="student")), sys.stdout, indent=4, ensure_ascii=False)
 
 
 def get_means_medians_quantiles(data):
@@ -73,6 +54,15 @@ def get_number_of_passed_guys(points):
         if point > 0:
             passed += 1
     return passed
+
+
+def get_dictionary(data):
+    keys = data.keys()
+    stats = get_means_medians_quantiles(data)
+    d = {}
+    for key in keys:
+        d[key] = get_statistics(stats[0][[key]], stats[1][[key]], get_number_of_passed_guys(data.loc[:, key]), key)
+    return d
 
 
 main()
