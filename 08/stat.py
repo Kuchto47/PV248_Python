@@ -17,11 +17,29 @@ def main():
 
 
 def exercises(data):
-    print(data.keys())
+    extra_length = len(" YYYY-MM-DD/")
+    grouped_data = data.groupby(data.columns.map(lambda x: x[extra_length:]), axis=1).sum()
+    keys = grouped_data.keys()
+    d = {}
+    stats = get_means_medians_quantiles(grouped_data)
+    for key in keys:
+        if key == "student"[extra_length:]:
+            continue
+        d[key] = get_statistics(stats[0][[key]], stats[1][[key]], get_number_of_passed_guys(grouped_data.loc[:, key]), key)
+    json.dump(d, sys.stdout, indent=4, ensure_ascii=False)
 
 
 def dates(data):
-    print(data.keys())
+    extra_length = len("/NN")*(-1)
+    grouped_data = data.groupby(data.columns.map(lambda x: x[:extra_length]), axis=1).sum()
+    keys = grouped_data.keys()
+    d = {}
+    stats = get_means_medians_quantiles(grouped_data)
+    for key in keys:
+        if key == "student"[:extra_length]:
+            continue
+        d[key] = get_statistics(stats[0][[key]], stats[1][[key]], get_number_of_passed_guys(grouped_data.loc[:, key]), key)
+    json.dump(d, sys.stdout, indent=4, ensure_ascii=False)
 
 
 def deadlines(data):
