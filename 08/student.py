@@ -54,8 +54,8 @@ def get_data(data):
         "total": data_with_days_from_start_of_semester.sum(),
         "passed": get_passed_count(data_grouped_by_exercises),
         "regression slope": slope,
-        "date 16": get_date_from_days(16/slope),
-        "date 20": get_date_from_days(20/slope)
+        "date 16": float("inf") if slope == 0 else get_date_from_days(16/slope),
+        "date 20": float("inf") if slope == 0 else get_date_from_days(20/slope)
     }
 
 
