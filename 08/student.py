@@ -3,7 +3,6 @@ import sys
 import numpy
 import json
 import datetime
-import math
 
 
 def main():
@@ -75,7 +74,6 @@ def get_date_from_days(days_from_start_of_semester):
     start_of_semester = datetime.date(2018, 9, 17)
     timedelta = datetime.timedelta(days=days_from_start_of_semester)
     date = start_of_semester+timedelta
-    print("DATE - DELTA:", date-timedelta)
     return "%d-%02d-%02d" % (date.year, date.month, date.day)
 
 
