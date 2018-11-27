@@ -23,12 +23,12 @@ def parse_url(url):
     return url[index+2 if index > 0 else 0:split_index], url[split_index:]
 
 
-def check_json(post_json, obj):
+def check_json(post_json):
     if "type" in post_json and post_json["type"] == "POST" and ("url" not in post_json or "content" not in post_json):
         return False, None, None, None, None, None
     m_type = post_json["type"] if "type" in post_json else "GET"
     m_url = parse_url(post_json["url"] if "url" in post_json else str(sys.argv[2]))
-    m_headers = post_json["headers"] if "headers" in post_json else obj.headers  # {"Content-Type": "application/json"}  #
+    m_headers = post_json["headers"] if "headers" in post_json else {}
     m_content = None if m_type == "GET" else post_json["content"]
     m_timeout = post_json["timeout"] if "timeout" in post_json else 1
     return True, m_type, m_url, m_headers, m_content, m_timeout
@@ -43,7 +43,7 @@ class ServerHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         parsed_url = parse_url(str(sys.argv[2]))
         client = http.client.HTTPConnection(parsed_url[0], timeout=1)
-        header = self.headers  # {"Content-Type": "application/json"}  #
+        header = self.headers  # {"Content-Type": "application/json"}
         timeout = True
         try:
             client.request('GET', parsed_url[1], headers=header)
@@ -56,8 +56,8 @@ class ServerHandler(http.server.BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            post_json = json.loads(self.rfile.read(int(self.headers['Content-Length'])).decode())
-            result = check_json(post_json, self)
+            post_json = json.loads(self.rfile.read(int(self.headers.get('Content-Length', 0))).decode())
+            result = check_json(post_json)
             if result[0] is False:
                 self.set_headers()
                 self.construct_json(response=None, timeout=False, invalid_json=True)
