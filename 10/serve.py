@@ -2,6 +2,7 @@ import sys
 import http.server
 import socketserver
 import os
+import json
 
 
 PORT = int(sys.argv[1])
@@ -23,14 +24,20 @@ class ServerHandler(http.server.CGIHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        self.deal_with_request()
+        self.deal_with_request("GET")
 
     def do_POST(self):
-        self.deal_with_request()
+        self.deal_with_request("POST")
 
-    def deal_with_request(self):
-        relative_path = self.path[1:]
-        path_to_file = os.path.join(DIR, relative_path)
+    def deal_with_request(self, type):
+        if type == 'POST':
+            post_json = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
+            val = str(post_json["content"])
+            relative_path = val if not val.startswith("/") else val[1:]
+        else:
+            relative_path = self.path[1:]
+        file_name = relative_path.split("?")[0]
+        path_to_file = os.path.join(DIR, file_name)
         if os.path.isfile(path_to_file):
             file_extension = os.path.splitext(path_to_file)[1]
             if file_extension.lower() == ".cgi":
@@ -39,9 +46,6 @@ class ServerHandler(http.server.CGIHTTPRequestHandler):
                 self.run_cgi()
             else:
                 super().do_GET()
-            # file = open(path_to_file, 'rb').read()
-            # self.set_headers()
-            # self.wfile.write(bytes(file))
             pass
         elif os.path.isdir(path_to_file):
             self.set_headers(403, "Forbidden - Requested path is a directory")
