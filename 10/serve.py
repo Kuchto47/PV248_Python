@@ -2,7 +2,6 @@ import sys
 import http.server
 import socketserver
 import os
-import json
 
 
 PORT = int(sys.argv[1])
@@ -15,42 +14,63 @@ class ServerHandler(http.server.CGIHTTPRequestHandler):
 
     cgi_directories = [DIR]
 
-    def set_headers(self, code, reason=None):
+    def set_headers(self, code, path_to_file, reason=None):
         if reason is not None:
             self.send_error(code, explain=reason)
+            self.end_headers()
         else:
             self.send_response(code)
-        self.send_header("Content-Type", "application/json")
-        self.end_headers()
+            if path_to_file.endswith(".txt"):
+                self.send_header("Content-Type", "text/plain")
+            else:
+                self.send_header("Content-Type", "application/octet-stream")
+            self.send_header("Content-Length", os.path.getsize(path_to_file))
+            self.send_header("Content-Disposition", 'attachment; filename="' + os.path.basename(path_to_file) + "\"")
+            self.end_headers()
 
     def do_GET(self):
-        self.deal_with_request("GET")
+        self.deal_with_request()
 
     def do_POST(self):
-        self.deal_with_request("POST")
+        self.deal_with_request()
 
-    def deal_with_request(self, type):
-        if type == 'POST':
-            post_json = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-            val = str(post_json["content"])
-            relative_path = val if not val.startswith("/") else val[1:]
-        else:
-            relative_path = self.path[1:]
-        file_name = relative_path.split("?")[0]
+    def deal_with_request(self):
+        relative_path = self.path[1:]
+        file_name, cgi_params = self.get_request_params(relative_path)
         path_to_file = os.path.join(DIR, file_name)
         if os.path.isfile(path_to_file):
-            file_extension = os.path.splitext(path_to_file)[1]
-            if file_extension.lower() == ".cgi":
-                dir_without_slash = DIR if (not DIR.endswith('/') and not DIR.endswith('\\')) else DIR[:-1]
-                self.cgi_info = dir_without_slash, relative_path
-                self.run_cgi()
+            if path_to_file.endswith(".cgi"):
+                self.start_cgi(path_to_file, cgi_params)
             else:
-                super().do_GET()
-            pass
+                self.serve_static_content(path_to_file)
         elif os.path.isdir(path_to_file):
             self.set_headers(403, "Forbidden - Requested path is a directory")
         else:
             self.set_headers(404, "Not found")
+
+    def get_request_params(self, relative_path):
+        splitted = relative_path.split("?")
+        if len(splitted) == 1:
+            return splitted[0], None
+        else:
+            return splitted[0], splitted[1]
+
+    def start_cgi(self, path_to_file, cgi_params):
+        path_to_cgi_relative_to_current = os.path.relpath(path_to_file)
+        actual_cgi = os.path.basename(path_to_cgi_relative_to_current)
+        if cgi_params is not None:
+            actual_cgi += "?" + cgi_params
+        self.cgi_info = os.path.dirname(path_to_cgi_relative_to_current), actual_cgi
+        self.run_cgi()
+
+    def serve_static_content(self, path_to_file):
+        self.set_headers(200, path_to_file)
+        with open(path_to_file, 'rb') as f:
+            while True:
+                chunk = f.read(256)
+                if not chunk:
+                    break
+                self.wfile.write(chunk)
 
 
 class Server(socketserver.ThreadingMixIn, http.server.HTTPServer):
